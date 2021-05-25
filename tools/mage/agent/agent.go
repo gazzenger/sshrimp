@@ -6,6 +6,14 @@ import (
 
 // Build Builds the local ssh agent
 func Build() error {
+	// sh.Run("env GOOS=windows GOARCH=amd64")
+
+	// env := map[string]string{
+	// 	"GOOS":   "windows",
+	// 	"GOARCH": "amd64",
+	// }
+	// sh.RunWith(env, "go", "build", "./cmd/sshrimp-agent")
+
 	return sh.Run("go", "build", "./cmd/sshrimp-agent")
 }
 
