@@ -37,6 +37,7 @@ type CertificateAuthority struct {
 	ValidAfterOffset   string
 	ValidBeforeOffset  string
 	Extensions         []string
+	ProvisioningUser   string
 }
 
 // SSHrimp main configuration struct for sshrimp-agent and sshrimp-ca
@@ -109,6 +110,7 @@ func NewSSHrimpWithDefaults() *SSHrimp {
 				"permit-user-rc",
 				"no-x11-forwarding",
 			},
+			ProvisioningUser: "",
 		},
 	}
 	return &sshrimp

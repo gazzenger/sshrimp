@@ -42,7 +42,7 @@ func HandleRequest(ctx context.Context, event signer.SSHrimpEvent) (*signer.SSHr
 
 	// Validate the user supplied identity token with the loaded configuration
 	i, err := identity.NewIdentity(c)
-	username, err := i.Validate(event.Token)
+	username, roles, err := i.Validate(event.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -109,16 +109,24 @@ func HandleRequest(ctx context.Context, event signer.SSHrimpEvent) (*signer.SSHr
 		validBefore.Format("2006/01/02 15:04:05"),
 	)
 
+	// Merge username with additional principal roles
+	principals := make([]string, len(roles)+2)
+	principals[0] = username
+	for i, v := range roles {
+		principals[i+1] = v
+	}
+
+	// Add additional roles for the provisioning account
+	principals[len(principals)-1] = c.CertificateAuthority.ProvisioningUser
+
 	// Create the certificate struct with all our configured alues
 	certificate := ssh.Certificate{
-		Nonce:    nonce,
-		Key:      publicKey,
-		Serial:   serial.Uint64(),
-		CertType: ssh.UserCert,
-		KeyId:    keyID,
-		ValidPrincipals: []string{
-			username,
-		},
+		Nonce:           nonce,
+		Key:             publicKey,
+		Serial:          serial.Uint64(),
+		CertType:        ssh.UserCert,
+		KeyId:           keyID,
+		ValidPrincipals: principals,
 		Permissions: ssh.Permissions{
 			CriticalOptions: criticalOptions,
 			Extensions:      extensions,
