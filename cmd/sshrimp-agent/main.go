@@ -4,9 +4,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"errors"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"os/signal"
@@ -14,7 +12,6 @@ import (
 	"syscall"
 
 	"github.com/alecthomas/kong"
-
 	"github.com/stoggi/sshrimp/internal/config"
 	"github.com/stoggi/sshrimp/internal/sshrimpagent"
 	"golang.org/x/crypto/ssh"
@@ -102,8 +99,10 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 			}
 			return err
 		}
-		if err = agent.ServeAgent(sshrimpAgent, conn); err != nil && !errors.Is(err, io.EOF) {
-			return err
-		}
+
+		go agent.ServeAgent(sshrimpAgent, conn)
+		// if err = agent.ServeAgent(sshrimpAgent, conn); err != nil && !errors.Is(err, io.EOF) {
+		// 	return err
+		// }
 	}
 }

@@ -9,3 +9,5 @@ sshrimp-agent
 terraform.tfstate
 terraform.tfstate.backup
 .terraform
+
+*.exe
