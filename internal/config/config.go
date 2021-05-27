@@ -26,18 +26,20 @@ type Agent struct {
 
 // CertificateAuthority config for the sshrimp-ca lambda
 type CertificateAuthority struct {
-	AccountID          int
-	Regions            []string
-	FunctionName       string
-	KeyAlias           string
-	ForceCommandRegex  string
-	SourceAddressRegex string
-	UsernameRegex      string
-	UsernameClaim      string
-	ValidAfterOffset   string
-	ValidBeforeOffset  string
-	Extensions         []string
-	ProvisioningUser   string
+	AccountID                int
+	Regions                  []string
+	FunctionName             string
+	KeyAlias                 string
+	ForceCommandRegex        string
+	SourceAddressRegex       string
+	UsernameRegex            string
+	UsernameClaim            string
+	ValidAfterOffset         string
+	ValidBeforeOffset        string
+	Extensions               []string
+	ProvisioningUser         string
+	IdentityProviderURI      string
+	IdentityProviderClientID string
 }
 
 // SSHrimp main configuration struct for sshrimp-agent and sshrimp-ca

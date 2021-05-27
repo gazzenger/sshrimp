@@ -5,9 +5,10 @@ sshrimp-ca.tf.json
 sshrimp-ca.zip
 
 sshrimp-agent
+sshrimp-agent.exe
 
 terraform.tfstate
 terraform.tfstate.backup
 .terraform
-
-*.exe
+.terraform.lock.hcl
+policy-variables.tf

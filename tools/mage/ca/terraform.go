@@ -55,3 +55,27 @@ func generateTerraform(c *config.SSHrimp) ([]byte, error) {
 
 	return json.MarshalIndent(output, "", "  ")
 }
+
+func generateVariableDefinitionsFile(c *config.SSHrimp) []byte {
+
+	webidentityPrincipaIdentifiers := "arn:aws:iam::" + strconv.Itoa(c.CertificateAuthority.AccountID) + ":oidc-provider/" + c.CertificateAuthority.IdentityProviderURI
+	webidentityProviderUrl := c.CertificateAuthority.IdentityProviderURI + ":aud"
+	webidentityClientId := c.CertificateAuthority.IdentityProviderClientID
+
+	outputString := "variable \"webidentity_principal_identifiers\" {\n" +
+		"  type    = string\n" +
+		"  default = \"" + webidentityPrincipaIdentifiers + "\"\n" +
+		"}\n" +
+		"variable \"webidentity_provider_url\" {\n" +
+		"  type    = string\n" +
+		"  default = \"" + webidentityProviderUrl + "\"\n" +
+		"}\n" +
+		"variable \"webidentity_client_id\" {\n" +
+		"  type    = string\n" +
+		"  default = \"" + webidentityClientId + "\"\n" +
+		"}"
+
+	outputArray := []byte(outputString)
+
+	return outputArray
+}

@@ -64,10 +64,6 @@ func Package() error {
 
 // Generate Generates a CloudFormation template used to deploy the certificate authority
 func Generate() error {
-	if modified, err := target.Path("sshrimp-ca.tf.json", config.GetPath()); err == nil && !modified {
-		return nil
-	}
-
 	mg.Deps(Config)
 
 	c := config.NewSSHrimp()
@@ -75,11 +71,20 @@ func Generate() error {
 		return err
 	}
 
-	template, err := generateTerraform(c)
-	if err != nil {
-		return err
+	if modified, err := target.Path("sshrimp-ca.tf.json", config.GetPath()); err == nil && modified {
+		template, err := generateTerraform(c)
+		if err != nil {
+			return err
+		}
+		ioutil.WriteFile("sshrimp-ca.tf.json", template, 0644)
 	}
-	ioutil.WriteFile("sshrimp-ca.tf.json", template, 0644)
+
+	if modified, err := target.Path("./terraform/policy-variables.tf", config.GetPath()); err == nil && modified {
+		// Generate policy variable file
+		variableDefinitionsFile := generateVariableDefinitionsFile(c)
+		ioutil.WriteFile("./terraform/policy-variables.tf", variableDefinitionsFile, 0644)
+	}
+
 	return nil
 }
 
