@@ -28,7 +28,7 @@ func InitSocketListener(socketAddress string, err error) (net.Listener, error) {
 	// setup AF_UNIX domain socket for use with Linux, Mac or WSL
 	// This affects all files created for the process. Since this is a sensitive
 	// socket, only allow the current user to write to the socket.
-	syscall.Umask(0077)
+	// syscall.Umask(0077)
 	return net.Listen("unix", socketAddress)
 
 }
