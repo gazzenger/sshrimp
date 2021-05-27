@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/Microsoft/go-winio"
 	"github.com/alecthomas/kong"
 	"github.com/stoggi/sshrimp/internal/config"
 	"github.com/stoggi/sshrimp/internal/sshrimpagent"
@@ -46,8 +45,8 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 		signer     ssh.Signer
 	)
 
-	// testing to ensure nothing else is using the AF_UNIX domain socket file
-	// only used on unix systems, or using WSL
+	// // testing to ensure nothing else is using the AF_UNIX domain socket file
+	// // only used on unix systems, or using WSL
 	// if _, err = os.Stat(c.Agent.Socket); err == nil {
 	// 	conn, sockErr := net.Dial("unix", c.Agent.Socket)
 	// 	if sockErr == nil { // socket is accepting connections
@@ -57,8 +56,9 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 	// 	os.Remove(c.Agent.Socket) // socket is not accepting connections, assuming safe to remove
 	// }
 
-	//on windows, without using WSL a pipe must be used instead
+	// //on windows, without using WSL a pipe must be used instead
 
+	// // setup AF_UNIX domain socket for use with Linux, Mac or WSL
 	// // This affects all files created for the process. Since this is a sensitive
 	// // socket, only allow the current user to write to the socket.
 	// syscall.Umask(0077)
@@ -66,32 +66,27 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 	// if err != nil {
 	// 	return err
 	// }
-	// defer listener.Close()
 
-	namedPipeFullName := "\\\\.\\pipe\\sshrimp"
-
-	// cu, err := user.Current()
+	// // setup named pipe for use with Windows OpenSSH
+	// namedPipeFullName := c.Agent.Socket
+	// var cfg = &winio.PipeConfig{}
+	// listener, err = winio.ListenPipe(namedPipeFullName, cfg)
 	// if err != nil {
 	// 	return err
 	// }
 
-	// sddl := fmt.Sprintf("D:P(A;;GA;;;%s)", cu.Uid)
-
-	// var cfg = &winio.PipeConfig{
-	// 	SecurityDescriptor: sddl,
-	// }
-
-	//+ windows
-	var cfg = &winio.PipeConfig{}
-
-	listener, err = winio.ListenPipe(namedPipeFullName, cfg)
+	if len(c.Agent.Socket) > 9 && c.Agent.Socket[0:9] == "\\\\.\\pipe\\" {
+		listener, err = InitPipeListener(c.Agent.Socket, err)
+	} else {
+		listener, err = InitSocketListener(c.Agent.Socket, err)
+	}
 	if err != nil {
 		return err
 	}
 
 	defer listener.Close()
 
-	// ctx.Printf("listening on %s", c.Agent.Socket)
+	ctx.Printf("listening on %s", c.Agent.Socket)
 
 	// Generate a new SSH private/public key pair
 	privateKey, err = rsa.GenerateKey(rand.Reader, 2048)

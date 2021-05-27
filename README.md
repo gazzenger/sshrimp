@@ -70,3 +70,21 @@ SSH to your host:
 * Has a [backronym](https://en.wikipedia.org/wiki/Backronym): SSH. Really. Isn't. My. Problem.
 * Shrimp on a barbie?
 * Yeah...
+
+
+
+## TODO
+* Daemonise the running of the agent
+* Sanitise the config.toml file so only the following fields are detailed
+
+```toml
+[Agent] 
+  ProviderURL = ""
+  ClientID = ""
+  BrowserCommand = [""]
+  Socket = ""
+
+[CertificateAuthority]
+  AccountID = 11111111
+  Regions = ["aaaaaaaa"]
+```

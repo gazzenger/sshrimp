@@ -4,7 +4,7 @@ sshrimp-ca
 sshrimp-ca.tf.json
 sshrimp-ca.zip
 
-sshrimp-agent
+./sshrimp-agent
 sshrimp-agent.exe
 
 terraform.tfstate
