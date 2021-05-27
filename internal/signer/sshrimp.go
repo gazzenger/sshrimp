@@ -1,12 +1,17 @@
 package signer
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/pkg/errors"
 	"github.com/stoggi/sshrimp/internal/config"
 	"golang.org/x/crypto/ssh"
@@ -43,11 +48,41 @@ func SignCertificateAllRegions(publicKey ssh.PublicKey, token string, forceComma
 
 // SignCertificateOneRegion given a public key, identity token and forceCommand, invoke the sshrimp-ca lambda function
 func SignCertificateOneRegion(publicKey ssh.PublicKey, token string, forceCommand string, region string, c *config.SSHrimp) (*ssh.Certificate, error) {
+
 	// Create a lambdaService using the new temporary credentials for the role
-	session := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(region),
+	// session := session.Must(session.NewSession()) <-- this is the other method for authenticating to AWS
+
+	// Create a lambdaService using AssumeRoleWithWebIdentity <-- this shares the same Identity Provider as AWSs IAM
+	initialSession := session.Must(session.NewSession())
+
+	// Create a STS client from just a session.
+	svc := sts.New(initialSession)
+
+	// build the roleARN string for sending
+	roleArn := "arn:aws:iam::" + strconv.Itoa(c.CertificateAuthority.AccountID) + ":role/sshrimp-ca-" + region
+	// extract the usernameClaim from the OIDC JWT
+	tokenUsernameClaim := DecodeAndReturnUsernameClaim(token, c.CertificateAuthority.UsernameClaim)
+
+	// send these credentials to AWS to recieve temporary static credentials
+	awsCred, err := svc.AssumeRoleWithWebIdentity(&sts.AssumeRoleWithWebIdentityInput{
+		RoleArn:          aws.String(roleArn),
+		RoleSessionName:  aws.String(tokenUsernameClaim),
+		WebIdentityToken: aws.String(token),
+		DurationSeconds:  aws.Int64(900),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("Unable to perform assume-role-with-web-identity: %v", err)
+	}
+
+	// use new temporary credentials for creating lambda service
+	creds := credentials.NewStaticCredentials(*awsCred.Credentials.AccessKeyId, *awsCred.Credentials.SecretAccessKey, *awsCred.Credentials.SessionToken)
+
+	tempSession := session.Must(session.NewSession(&aws.Config{
+		Region:      aws.String(region),
+		Credentials: creds,
 	}))
-	lambdaService := lambda.New(session)
+
+	lambdaService := lambda.New(tempSession)
 
 	// Setup the JSON payload for the SSHrimp CA
 	payload, err := json.Marshal(SSHrimpEvent{
@@ -89,4 +124,14 @@ func SignCertificateOneRegion(publicKey ssh.PublicKey, token string, forceComman
 		return nil, err
 	}
 	return cert.(*ssh.Certificate), nil
+}
+
+// used to decode the JWT payload, and return the value from the usernameClaim
+func DecodeAndReturnUsernameClaim(jwt string, usernameClaim string) string {
+	tokenParts := strings.Split(jwt, ".")
+	tokenPayloadBytes, _ := base64.StdEncoding.DecodeString(tokenParts[1])
+	tokenPayloadText := string(tokenPayloadBytes)
+	tokenUsernameClaimPos := strings.Index(tokenPayloadText, "\""+usernameClaim+"\"")
+	tokenUsernameClaimEndPos := strings.Index(tokenPayloadText[tokenUsernameClaimPos:], "\",\"")
+	return tokenPayloadText[tokenUsernameClaimPos+len(usernameClaim)+4 : tokenUsernameClaimPos+tokenUsernameClaimEndPos]
 }

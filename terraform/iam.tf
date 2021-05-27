@@ -8,6 +8,20 @@ data "aws_iam_policy_document" "sshrimp_ca_assume_role" {
       identifiers = ["lambda.amazonaws.com"]
     }
   }
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = ["${var.webidentity_principal_identifiers}"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${var.webidentity_provider_url}"
+      values = ["${var.webidentity_client_id}"]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "sshrimp_ca" {
@@ -26,6 +40,7 @@ data "aws_iam_policy_document" "sshrimp_ca" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
+      "lambda:InvokeFunction",
     ]
 
     resources = [
@@ -33,7 +48,6 @@ data "aws_iam_policy_document" "sshrimp_ca" {
     ]
   }
 }
-
 
 resource "aws_iam_role_policy" "sshrimp_ca" {
   name   = "sshrimp-ca-${data.aws_region.current.name}"
