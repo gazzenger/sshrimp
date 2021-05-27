@@ -4,13 +4,12 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"fmt"
 	"net"
 	"os"
 	"os/signal"
 	"strings"
-	"syscall"
 
+	"github.com/Microsoft/go-winio"
 	"github.com/alecthomas/kong"
 	"github.com/stoggi/sshrimp/internal/config"
 	"github.com/stoggi/sshrimp/internal/sshrimpagent"
@@ -47,25 +46,52 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 		signer     ssh.Signer
 	)
 
-	if _, err = os.Stat(c.Agent.Socket); err == nil {
-		conn, sockErr := net.Dial("unix", c.Agent.Socket)
-		if sockErr == nil { // socket is accepting connections
-			conn.Close()
-			return fmt.Errorf("socket %s already exists", c.Agent.Socket)
-		}
-		os.Remove(c.Agent.Socket) // socket is not accepting connections, assuming safe to remove
-	}
+	// testing to ensure nothing else is using the AF_UNIX domain socket file
+	// only used on unix systems, or using WSL
+	// if _, err = os.Stat(c.Agent.Socket); err == nil {
+	// 	conn, sockErr := net.Dial("unix", c.Agent.Socket)
+	// 	if sockErr == nil { // socket is accepting connections
+	// 		conn.Close()
+	// 		return fmt.Errorf("socket %s already exists", c.Agent.Socket)
+	// 	}
+	// 	os.Remove(c.Agent.Socket) // socket is not accepting connections, assuming safe to remove
+	// }
 
-	// This affects all files created for the process. Since this is a sensitive
-	// socket, only allow the current user to write to the socket.
-	syscall.Umask(0077)
-	listener, err = net.Listen("unix", c.Agent.Socket)
+	//on windows, without using WSL a pipe must be used instead
+
+	// // This affects all files created for the process. Since this is a sensitive
+	// // socket, only allow the current user to write to the socket.
+	// syscall.Umask(0077)
+	// listener, err = net.Listen("unix", c.Agent.Socket)
+	// if err != nil {
+	// 	return err
+	// }
+	// defer listener.Close()
+
+	namedPipeFullName := "\\\\.\\pipe\\sshrimp"
+
+	// cu, err := user.Current()
+	// if err != nil {
+	// 	return err
+	// }
+
+	// sddl := fmt.Sprintf("D:P(A;;GA;;;%s)", cu.Uid)
+
+	// var cfg = &winio.PipeConfig{
+	// 	SecurityDescriptor: sddl,
+	// }
+
+	//+ windows
+	var cfg = &winio.PipeConfig{}
+
+	listener, err = winio.ListenPipe(namedPipeFullName, cfg)
 	if err != nil {
 		return err
 	}
+
 	defer listener.Close()
 
-	ctx.Printf("listening on %s", c.Agent.Socket)
+	// ctx.Printf("listening on %s", c.Agent.Socket)
 
 	// Generate a new SSH private/public key pair
 	privateKey, err = rsa.GenerateKey(rand.Reader, 2048)
