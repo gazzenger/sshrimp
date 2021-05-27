@@ -303,6 +303,15 @@ func certificateAuthorityQuestions(config *SSHrimp) []*survey.Question {
 			},
 			Validate: survey.Required,
 		},
+		{
+			Name: "ProvisioningUser",
+			Prompt: &survey.Input{
+				Message: "Provisioning User for creating new users",
+				Help:    "An existing user account on the machine which can be used for adding the user if it doesn't exist. Added as a Principal to all signed certs.",
+				Default: config.CertificateAuthority.ProvisioningUser,
+			},
+			Validate: survey.Required,
+		},
 	}
 }
 
@@ -409,6 +418,10 @@ func Wizard(configPath string, config *SSHrimp) (string, error) {
 	if err := survey.Ask(agentQuestions(config), &newConfig.Agent); err != nil {
 		return "", err
 	}
+
+	//duplicating the necessary fields from Agent Config over to the CertificateAuthority Config
+	newConfig.CertificateAuthority.IdentityProviderURI = strings.Replace(newConfig.Agent.ProviderURL, "https://", "", 1)
+	newConfig.CertificateAuthority.IdentityProviderClientID = newConfig.Agent.ClientID
 
 	// Ask BrowserCommand separately so we can store it as a []string, currently not supported by survey.
 	var browserCommand string

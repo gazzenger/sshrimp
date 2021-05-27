@@ -110,14 +110,17 @@ func HandleRequest(ctx context.Context, event signer.SSHrimpEvent) (*signer.SSHr
 	)
 
 	// Merge username with additional principal roles
-	principals := make([]string, len(roles)+2)
+	principals := make([]string, len(roles)+1)
 	principals[0] = username
 	for i, v := range roles {
 		principals[i+1] = v
 	}
 
-	// Add additional roles for the provisioning account
-	principals[len(principals)-1] = c.CertificateAuthority.ProvisioningUser
+	//check for any defined provisioning user
+	if c.CertificateAuthority.ProvisioningUser != "" {
+		// Add additional roles for the provisioning account
+		principals = append(principals, c.CertificateAuthority.ProvisioningUser)
+	}
 
 	// Create the certificate struct with all our configured alues
 	certificate := ssh.Certificate{
