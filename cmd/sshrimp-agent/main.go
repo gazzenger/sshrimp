@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kong"
-	"github.com/stoggi/sshrimp/internal/config"
-	"github.com/stoggi/sshrimp/internal/sshrimpagent"
+	"github.com/gazzenger/sshrimp/internal/config"
+	"github.com/gazzenger/sshrimp/internal/sshrimpagent"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )

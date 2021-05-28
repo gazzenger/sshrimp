@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/stoggi/sshrimp/internal/config"
+	"github.com/gazzenger/sshrimp/internal/config"
 )
 
 // Provider describes an AWS provider

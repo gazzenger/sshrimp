@@ -12,8 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/gazzenger/sshrimp/internal/config"
 	"github.com/pkg/errors"
-	"github.com/stoggi/sshrimp/internal/config"
 	"golang.org/x/crypto/ssh"
 )
 

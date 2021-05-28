@@ -1,4 +1,4 @@
-module github.com/stoggi/sshrimp
+module github.com/gazzenger/sshrimp
 
 go 1.13
 
