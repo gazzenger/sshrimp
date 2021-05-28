@@ -116,6 +116,8 @@ github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMo
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/gazzenger/aws-oidc v0.0.0-20190621033350-d7c8067c7515 h1:+hB8m3lZcit6hNP/wgKXyYu40HBnqOZ1qeTqfR3R2SM=
 github.com/gazzenger/aws-oidc v0.0.0-20190621033350-d7c8067c7515/go.mod h1:SIKyxDgizI85GJhq5gKSaAx95RVsVY3zm2pwe9jKJ+E=
+github.com/gazzenger/aws-oidc v0.0.0-20210528114122-e5599407fe4c h1:hX3eCyIg67My0KxzheA3rZ1rqFVC+ROH1VIaJZge+Pg=
+github.com/gazzenger/aws-oidc v0.0.0-20210528114122-e5599407fe4c/go.mod h1:OXZ6Z+A10UlVXxCzj47fT2/VeEPKnMAMSg/GB9NJaF0=
 github.com/ghodss/yaml v1.0.0 h1:wQHKEahhL6wmXdzwWG11gIVCkOv05bNOh+Rxn0yngAk=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
@@ -296,8 +298,6 @@ github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a h1:pa8hGb/2
 github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
 github.com/spf13/afero v1.2.2 h1:5jhuqJyZCZf2JRofRvN/nIFgIWNzPa3/Vz8mYylgbWc=
 github.com/spf13/afero v1.2.2/go.mod h1:9ZxEEn6pIJ8Rxe320qSDBk6AsU0r9pR7Q4OcevTdifk=
-github.com/stoggi/aws-oidc v0.0.0-20190621033350-d7c8067c7515 h1:+hB8m3lZcit6hNP/wgKXyYu40HBnqOZ1qeTqfR3R2SM=
-github.com/stoggi/aws-oidc v0.0.0-20190621033350-d7c8067c7515/go.mod h1:SIKyxDgizI85GJhq5gKSaAx95RVsVY3zm2pwe9jKJ+E=
 github.com/stoggi/gocfn v0.0.0-20200214083946-6202cea979b9 h1:ldPJnZz4pMqMvrHXWGGXJjj8xpbpTRE+ebRKqKnlx38=
 github.com/stoggi/gocfn v0.0.0-20200214083946-6202cea979b9/go.mod h1:BeVU0jP5A5p0orflxiMya9WiTToEr84235rsJKU8a1Y=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

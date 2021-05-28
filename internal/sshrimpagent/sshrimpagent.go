@@ -5,9 +5,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/gazzenger/aws-oidc/provider"
 	"github.com/gazzenger/sshrimp/internal/config"
 	"github.com/gazzenger/sshrimp/internal/signer"
-	"github.com/stoggi/aws-oidc/provider"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )
