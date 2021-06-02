@@ -72,10 +72,41 @@ SSH to your host:
 * Yeah...
 
 
+## Usage on Windows
+On Windows - you can use WSL and use the server agent exactly the same as on Linux
+or
+If using OpenSSH Client (installed via Windows Features) this currently only supports Pipes, therefore to get this working, configure the socket field in the config file to be 
+```
+Socket = "\\\\.\\pipe\\sshrimp"
+```
+And this can either be referenced by doing the following
+```cmd
+set SSH_AUTH_SOCK=\\.\pipe\ssh-pageant
+ssh username@ipaddress
+```
+or setup the config file 
+```cmd
+Host [HOSTNAME]
+    HostName [IPADDRESS]
+    User [USERNAME]
+    IdentityAgent \\.\pipe\sshrimp
+    ForwardAgent yes
+```
+Then run the ssh command
+```cmd
+ssh [HOSTNAME]
+```
+
+## Code Sources
+A thanks for help from
+- Main body of this repository is forked from Jeremy Stott's SSHrimp project - https://github.com/stoggi/sshrimp - MIT
+- Usage with Pipes on Windows - https://github.com/benpye/wsl-ssh-pageant - BSD 2-Clause
+- Minor updates to Serve Agent for allowing multiple connections - https://github.com/daveadams/vaulted/blob/56a9a631ececd4610d83d6499725b34d64285ccc/lib/proxy_keyring.go#L82 - MIT
+
 
 ## TODO
-* Daemonise the running of the agent
-* Sanitise the config.toml file so only the following fields are detailed
+* Daemonise the running of the agent for Windows and Linux
+* Generate a sanitised config.toml file for use with clients PCs (so only the following fields are detailed)
 
 ```toml
 [Agent] 
@@ -87,4 +118,14 @@ SSH to your host:
 [CertificateAuthority]
   AccountID = 11111111
   Regions = ["aaaaaaaa"]
+```
+
+* Flag for forcing use of private browser mode
+(This would require the user to have to login every time)
+```
+msedge google.com -Inprivate
+chrome --incognito google.com
+firefox.exe -private-window google.com
+chromium-browser --incognito google.com
+opera -newprivatetab google.com
 ```

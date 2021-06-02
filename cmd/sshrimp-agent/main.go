@@ -75,6 +75,7 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 	// 	return err
 	// }
 
+	// usage of a pipe is taken from repository https://github.com/benpye/wsl-ssh-pageant
 	if len(c.Agent.Socket) > 9 && c.Agent.Socket[0:9] == "\\\\.\\pipe\\" {
 		listener, err = InitPipeListener(c.Agent.Socket, err)
 	} else {
