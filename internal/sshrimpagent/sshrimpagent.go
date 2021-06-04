@@ -24,13 +24,14 @@ type sshrimpAgent struct {
 func NewSSHrimpAgent(c *config.SSHrimp, signer ssh.Signer) agent.Agent {
 
 	providerConfig := provider.ProviderConfig{
-		ClientID:     c.Agent.ClientID,
-		ClientSecret: c.Agent.ClientSecret,
-		ProviderURL:  c.Agent.ProviderURL,
-		PKCE:         true,
-		Nonce:        true,
-		AgentCommand: c.Agent.BrowserCommand,
-		// ProviderReturnHTML: "<HTML><HEAD></HEAD><BODY onload=\"window.open('', '_self', ''); window.close();\">Successfully Logged in, you can close this page</BODY></HTML>",
+		ClientID:               c.Agent.ClientID,
+		ClientSecret:           c.Agent.ClientSecret,
+		ProviderURL:            c.Agent.ProviderURL,
+		PKCE:                   true,
+		Nonce:                  true,
+		AgentCommand:           c.Agent.BrowserCommand,
+		ProviderReturnHTML:     "<HTML><HEAD></HEAD><BODY onload=\"window.open('', '_self', ''); window.close();\">Successfully Logged in, you can close this page</BODY></HTML>",
+		AgentUseDefaultBrowser: true,
 	}
 
 	return &sshrimpAgent{
