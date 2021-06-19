@@ -1,4 +1,5 @@
 // +build darwin linux
+
 package main
 
 import (
@@ -12,8 +13,7 @@ func init() {
 	sigs = append(sigs, syscall.SIGTERM, syscall.SIGHUP)
 }
 
-func InitSocketListener(socketAddress string, err error) (net.Listener, error) {
-
+func InitListener(socketAddress string, err error) (net.Listener, error) {
 	// testing to ensure nothing else is using the AF_UNIX domain socket file
 	// only used on unix systems, or using WSL
 	if _, err = os.Stat(socketAddress); err == nil {
@@ -24,11 +24,9 @@ func InitSocketListener(socketAddress string, err error) (net.Listener, error) {
 		}
 		os.Remove(socketAddress) // socket is not accepting connections, assuming safe to remove
 	}
-
 	// setup AF_UNIX domain socket for use with Linux, Mac or WSL
 	// This affects all files created for the process. Since this is a sensitive
 	// socket, only allow the current user to write to the socket.
 	// syscall.Umask(0077)
 	return net.Listen("unix", socketAddress)
-
 }
