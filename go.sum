@@ -31,8 +31,8 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dvsekhvalnov/jose2go v0.0.0-20180829124132-7f401d37b68a/go.mod h1:7BvyPhdbLxMXIYTFPLsyJRFMsKmOZnQmzh6Gb+uquuM=
-github.com/gazzenger/aws-oidc v0.0.0-20210619080922-b29e6b03f557 h1:JWhzbQTnmzNkNOEd4mVjC6gaek7TnttSfcD8XL3jPQo=
-github.com/gazzenger/aws-oidc v0.0.0-20210619080922-b29e6b03f557/go.mod h1:OXZ6Z+A10UlVXxCzj47fT2/VeEPKnMAMSg/GB9NJaF0=
+github.com/gazzenger/aws-oidc v0.0.0-20210620061911-39a318848078 h1:eF6euV1sESviVpaBpf5UGtM230EMN8jx/qSeS33WDoQ=
+github.com/gazzenger/aws-oidc v0.0.0-20210620061911-39a318848078/go.mod h1:OXZ6Z+A10UlVXxCzj47fT2/VeEPKnMAMSg/GB9NJaF0=
 github.com/go-ini/ini v1.42.0/go.mod h1:ByCAeIL28uOIIG0E3PJtZPDL8WnHpFKFOtgjp+3Ies8=
 github.com/godbus/dbus v4.1.0+incompatible/go.mod h1:/YcGZj5zSblfDWMMoOzV4fas9FZnQYTkDnsGvmh2Grw=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=

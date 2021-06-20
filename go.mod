@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go v1.25.43
 	github.com/awslabs/goformation/v4 v4.4.0
 	github.com/coreos/go-oidc v2.1.0+incompatible
-	github.com/gazzenger/aws-oidc v0.0.0-20210619080922-b29e6b03f557
+	github.com/gazzenger/aws-oidc v0.0.0-20210620061911-39a318848078
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/magefile/mage v1.9.0
 	github.com/pkg/errors v0.9.1
