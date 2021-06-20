@@ -4,16 +4,14 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"fmt"
 	"net"
 	"os"
 	"os/signal"
 	"strings"
-	"syscall"
 
 	"github.com/alecthomas/kong"
-	"github.com/stoggi/sshrimp/internal/config"
-	"github.com/stoggi/sshrimp/internal/sshrimpagent"
+	"github.com/gazzenger/sshrimp/internal/config"
+	"github.com/gazzenger/sshrimp/internal/sshrimpagent"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )
@@ -47,22 +45,48 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 		signer     ssh.Signer
 	)
 
-	if _, err = os.Stat(c.Agent.Socket); err == nil {
-		conn, sockErr := net.Dial("unix", c.Agent.Socket)
-		if sockErr == nil { // socket is accepting connections
-			conn.Close()
-			return fmt.Errorf("socket %s already exists", c.Agent.Socket)
-		}
-		os.Remove(c.Agent.Socket) // socket is not accepting connections, assuming safe to remove
-	}
+	// // testing to ensure nothing else is using the AF_UNIX domain socket file
+	// // only used on unix systems, or using WSL
+	// if _, err = os.Stat(c.Agent.Socket); err == nil {
+	// 	conn, sockErr := net.Dial("unix", c.Agent.Socket)
+	// 	if sockErr == nil { // socket is accepting connections
+	// 		conn.Close()
+	// 		return fmt.Errorf("socket %s already exists", c.Agent.Socket)
+	// 	}
+	// 	os.Remove(c.Agent.Socket) // socket is not accepting connections, assuming safe to remove
+	// }
 
-	// This affects all files created for the process. Since this is a sensitive
-	// socket, only allow the current user to write to the socket.
-	syscall.Umask(0077)
-	listener, err = net.Listen("unix", c.Agent.Socket)
+	// //on windows, without using WSL a pipe must be used instead
+
+	// // setup AF_UNIX domain socket for use with Linux, Mac or WSL
+	// // This affects all files created for the process. Since this is a sensitive
+	// // socket, only allow the current user to write to the socket.
+	// syscall.Umask(0077)
+	// listener, err = net.Listen("unix", c.Agent.Socket)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// // setup named pipe for use with Windows OpenSSH
+	// namedPipeFullName := c.Agent.Socket
+	// var cfg = &winio.PipeConfig{}
+	// listener, err = winio.ListenPipe(namedPipeFullName, cfg)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// usage of a pipe is taken from repository https://github.com/benpye/wsl-ssh-pageant
+	// if len(c.Agent.Socket) > 9 && c.Agent.Socket[0:9] == "\\\\.\\pipe\\" {
+	// 	listener, err = InitPipeListener(c.Agent.Socket, err)
+	// } else {
+	// 	listener, err = InitSocketListener(c.Agent.Socket, err)
+	// }
+
+	listener, err = InitListener(c.Agent.Socket, err)
 	if err != nil {
 		return err
 	}
+
 	defer listener.Close()
 
 	ctx.Printf("listening on %s", c.Agent.Socket)

@@ -13,9 +13,9 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	"github.com/stoggi/sshrimp/internal/config"
-	"github.com/stoggi/sshrimp/internal/identity"
-	"github.com/stoggi/sshrimp/internal/signer"
+	"github.com/gazzenger/sshrimp/internal/config"
+	"github.com/gazzenger/sshrimp/internal/identity"
+	"github.com/gazzenger/sshrimp/internal/signer"
 	"golang.org/x/crypto/ssh"
 )
 

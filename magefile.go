@@ -9,9 +9,9 @@ import (
 	"github.com/magefile/mage/mg"
 
 	// mage:import ca
-	"github.com/stoggi/sshrimp/tools/mage/ca"
+	"github.com/gazzenger/sshrimp/tools/mage/ca"
 	// mage:import agent
-	"github.com/stoggi/sshrimp/tools/mage/agent"
+	"github.com/gazzenger/sshrimp/tools/mage/agent"
 )
 
 var Default = All

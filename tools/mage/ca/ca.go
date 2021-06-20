@@ -13,7 +13,7 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
-	"github.com/stoggi/sshrimp/internal/config"
+	"github.com/gazzenger/sshrimp/internal/config"
 	"golang.org/x/crypto/ssh"
 )
 

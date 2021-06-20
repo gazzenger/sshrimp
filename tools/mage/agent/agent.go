@@ -1,18 +1,30 @@
 package agent
 
 import (
+	"runtime"
+
 	"github.com/magefile/mage/sh"
 )
 
 // Build Builds the local ssh agent
 func Build() error {
-	// sh.Run("env GOOS=windows GOARCH=amd64")
 
-	// env := map[string]string{
-	// 	"GOOS":   "windows",
-	// 	"GOARCH": "amd64",
-	// }
-	// sh.RunWith(env, "go", "build", "./cmd/sshrimp-agent")
+	// if running windows, compile for all platforms
+	if runtime.GOOS == "windows" {
+
+		env := map[string]string{
+			"GOOS":   "linux",
+			"GOARCH": "amd64",
+		}
+		sh.RunWith(env, "go", "build", "-o", "sshrimp-agent-linux", "./cmd/sshrimp-agent")
+
+		env = map[string]string{
+			"GOOS":   "darwin",
+			"GOARCH": "amd64",
+		}
+		sh.RunWith(env, "go", "build", "-o", "sshrimp-agent-mac", "./cmd/sshrimp-agent")
+
+	}
 
 	return sh.Run("go", "build", "./cmd/sshrimp-agent")
 }

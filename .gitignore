@@ -6,6 +6,8 @@ sshrimp-ca.zip
 
 sshrimp-agent
 sshrimp-agent.exe
+sshrimp-agent-linux
+sshrimp-agent-mac
 
 terraform.tfstate
 terraform.tfstate.backup
