@@ -10,12 +10,9 @@ while true; do
 done
 
 chmod +x sshrimp-agent-linux
+chmod +x sshrimp-agent-run.sh
 mkdir -p ~/sshrimp
 \cp -f sshrimp-agent-linux ~/sshrimp/
 \cp -f sshrimp-linux.toml ~/sshrimp/
 
-# if grep -q "~/sshrimp/sshrimp-agent-linux ~/sshrimp/sshrimp-linux.toml" ~/.bashrc ; then
-#     echo 'Already loaded in .bashrc'
-# else
-#     echo '~/sshrimp/sshrimp-agent-linux ~/sshrimp/sshrimp-linux.toml' >> ~/.bashrc
-# fi
+sudo \cp -f sshrimp-agent-run.sh /etc/profile.d/
