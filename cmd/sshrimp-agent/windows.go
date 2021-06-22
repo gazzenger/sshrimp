@@ -10,11 +10,25 @@ import (
 	"github.com/Microsoft/go-winio"
 )
 
+// func GetSystemSecurityDescriptor() string {
+//
+// SDDL encoded.
+//
+// (system = SECURITY_NT_AUTHORITY | SECURITY_LOCAL_SYSTEM_RID)
+// owner: system
+// grant: GENERIC_ALL to system
+//
+// return "O:SYD:(A;;GA;;;SY)"
+// return "S:(ML;;NW;;;LW)D:(A;;0x12019f;;;WD)"
+// }
+
 func InitListener(socketAddress string, err error) (net.Listener, error) {
 	if len(socketAddress) > 9 && socketAddress[0:9] == "\\\\.\\pipe\\" {
 		// setup named pipe for use with Windows OpenSSH
 		namedPipeFullName := socketAddress
-		var cfg = &winio.PipeConfig{}
+		var cfg = &winio.PipeConfig{
+			// SecurityDescriptor: GetSystemSecurityDescriptor(),
+		}
 		return winio.ListenPipe(namedPipeFullName, cfg)
 	} else {
 		// testing to ensure nothing else is using the AF_UNIX domain socket file

@@ -73,6 +73,7 @@ SSH to your host:
 
 
 ## Usage on Windows
+
 On Windows - you can use WSL and use the server agent exactly the same as on Linux
 or
 If using OpenSSH Client (installed via Windows Features) this currently only supports Pipes, therefore to get this working, configure the socket field in the config file to be 
@@ -97,17 +98,44 @@ Then run the ssh command
 ssh [HOSTNAME]
 ```
 
-## Code Sources
-A thanks for help from
-- Main body of this repository is forked from Jeremy Stott's SSHrimp project - https://github.com/stoggi/sshrimp - MIT
-- Usage with Pipes on Windows - https://github.com/benpye/wsl-ssh-pageant - BSD 2-Clause
-- Minor updates to Serve Agent for allowing multiple connections - https://github.com/daveadams/vaulted/blob/56a9a631ececd4610d83d6499725b34d64285ccc/lib/proxy_keyring.go#L82 - MIT
+## Deployment Config File
+Some of the default config settings are listed below
+```toml
+[Agent] 
+  ProviderURL = ""
+  ClientID = ""
+  BrowserCommand = [""]
+  Socket = ""
+
+[CertificateAuthority]
+  AccountID = XXXXX
+  Regions = [""]
+  FunctionName = "sshrimp"
+  KeyAlias = "alias/sshrimp"
+  ForceCommandRegex = "^$"
+  SourceAddressRegex = ""
+  UsernameRegex = "^(.*)@someemail\\.com"
+  UsernameClaim = "email"
+  ValidAfterOffset = "-5m"
+  ValidBeforeOffset = "+2m"
+  Extensions = ["permit-agent-forwarding", "permit-port-forwarding", "permit-pty", "permit-user-rc", "permit-x11-forwarding"]
+```
+> Please note the Browser command is no longer needed, with the updated AWS-OIDC, as the default browser can be utilised.
+
+> Also Socket can be defined as a UNIX socket file, OR a Windows Named Pipe
+
+## Client Distribution
+
+To build the SSHrimp-Agent for distribution across Windows, Linux and Mac, run the following mage command.
+*Please note this only runs on Windows, as the Windows Build requires packages only found on Windows*
+
+    mage buildandpackage
+> This will build the sshrimp-agent for Windows, Mac and Linux and place these in the deploy folder, and zip it up
 
 
-## TODO
-* Daemonise the running of the agent for Windows and Linux
-* Generate a sanitised config.toml file for use with clients PCs (so only the following fields are detailed)
+The output zip file is ```deploy.zip```, and contains the built sshrimp-agent executable for Windows, Mac and Linux in separate folders, with the config files, and deploy scripts.
 
+The config file contains bare minimum parameters for clients, these are shown below.
 ```toml
 [Agent] 
   ProviderURL = ""
@@ -119,13 +147,14 @@ A thanks for help from
   AccountID = 11111111
   Regions = ["aaaaaaaa"]
 ```
+## Code Sources
+A thanks for help from
+- Main body of this repository is forked from Jeremy Stott's SSHrimp project - https://github.com/stoggi/sshrimp - MIT
+- Usage with Pipes on Windows - https://github.com/benpye/wsl-ssh-pageant - BSD 2-Clause
+- Minor updates to Serve Agent for allowing multiple connections - https://github.com/daveadams/vaulted/blob/56a9a631ececd4610d83d6499725b34d64285ccc/lib/proxy_keyring.go#L82 - MIT
+- Recursively zip folder - https://stackoverflow.com/a/49057861
+- Create a launch agent on Mac - https://stackoverflow.com/questions/6442364/running-script-upon-login-mac
 
-* Flag for forcing use of private browser mode
-(This would require the user to have to login every time)
-```
-msedge google.com -Inprivate
-chrome --incognito google.com
-firefox.exe -private-window google.com
-chromium-browser --incognito google.com
-opera -newprivatetab google.com
-```
+
+## TODO
+* Connect with a provisioning user

@@ -21,6 +21,13 @@ func Build() {
 	mg.Deps(ca.Build, agent.Build)
 }
 
+// Builds for all platforms and package
+func BuildAndPackage() {
+	mg.Deps(agent.BuildAll, agent.PackageFiles)
+
+	fmt.Println("All done.")
+}
+
 // Remove all build output (except generated configuration files)
 func Clean() {
 	mg.Deps(ca.Clean, agent.Clean)
