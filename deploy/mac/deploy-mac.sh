@@ -9,6 +9,7 @@ while true; do
     esac
 done
 
+chmod +x sshrimp-agent-mac
 mkdir -p ~/sshrimp
 \cp -f sshrimp-agent-mac ~/sshrimp/
 \cp -f sshrimp-mac.toml ~/sshrimp/

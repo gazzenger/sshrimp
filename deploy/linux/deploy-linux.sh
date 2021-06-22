@@ -9,11 +9,13 @@ while true; do
     esac
 done
 
+chmod +x sshrimp-agent-linux
 mkdir -p ~/sshrimp
 \cp -f sshrimp-agent-linux ~/sshrimp/
 \cp -f sshrimp-linux.toml ~/sshrimp/
 
-if grep -q "~/sshrimp/sshrimp-agent-linux ~/sshrimp/sshrimp-linux.toml" "~/.bashrc" ; then
-else
-    echo '~/sshrimp/sshrimp-agent-linux ~/sshrimp/sshrimp-linux.toml' >> ~/.bashrc
-fi
+# if grep -q "~/sshrimp/sshrimp-agent-linux ~/sshrimp/sshrimp-linux.toml" ~/.bashrc ; then
+#     echo 'Already loaded in .bashrc'
+# else
+#     echo '~/sshrimp/sshrimp-agent-linux ~/sshrimp/sshrimp-linux.toml' >> ~/.bashrc
+# fi
