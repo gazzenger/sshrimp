@@ -158,3 +158,4 @@ A thanks for help from
 
 ## TODO
 * Connect with a provisioning user
+* Make zipping deploy.zip a .tar.gz to maintain ACL
