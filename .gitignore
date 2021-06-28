@@ -1,4 +1,7 @@
 sshrimp.toml
+sshrimp-windows.toml
+sshrimp-mac.toml
+sshrimp-linux.toml
 
 sshrimp-ca
 sshrimp-ca.tf.json
@@ -8,6 +11,9 @@ sshrimp-agent
 sshrimp-agent.exe
 sshrimp-agent-linux
 sshrimp-agent-mac
+sshrimp-agent-windows.exe
+
+deploy.zip
 
 terraform.tfstate
 terraform.tfstate.backup

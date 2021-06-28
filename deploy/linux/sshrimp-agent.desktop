@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=~/sshrimp/sshrimp-agent-linux ~/sshrimp/sshrimp-linux.toml
+X-GNOME-Autostart-enabled=true
+Terminal=false
+Name=SSHrimp-Agent
+Comment=SSHrimp-Agent

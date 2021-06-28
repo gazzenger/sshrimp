@@ -21,6 +21,18 @@ func Build() {
 	mg.Deps(ca.Build, agent.Build)
 }
 
+// Builds for all platforms and package
+// providing the config file is required, as it needs to be read
+// and used for generating config files for each platform
+func BuildAndPackage(configFile string) {
+	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+		fmt.Printf("Config File %s doesn't exist\n", configFile)
+		return
+	}
+	mg.Deps(agent.BuildAll, mg.F(agent.PackageFiles, configFile))
+	fmt.Println("All done.")
+}
+
 // Remove all build output (except generated configuration files)
 func Clean() {
 	mg.Deps(ca.Clean, agent.Clean)
