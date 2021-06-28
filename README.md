@@ -104,6 +104,7 @@ Some of the default config settings are listed below
 [Agent] 
   ProviderURL = ""
   ClientID = ""
+  ClientSecret = ""
   BrowserCommand = [""]
   Socket = ""
 
@@ -119,10 +120,15 @@ Some of the default config settings are listed below
   ValidAfterOffset = "-5m"
   ValidBeforeOffset = "+2m"
   Extensions = ["permit-agent-forwarding", "permit-port-forwarding", "permit-pty", "permit-user-rc", "permit-x11-forwarding"]
+  ProvisioningUser = "provisioninguser"
 ```
 > Please note the Browser command is no longer needed, with the updated AWS-OIDC, as the default browser can be utilised.
 
 > Also Socket can be defined as a UNIX socket file, OR a Windows Named Pipe
+
+## Provisioning User
+A new feature is to add a provisioning user field to the config file.
+This is then used by SSHrimp-CA to add this user as an additional principal to the signed ssh-key.
 
 ## Client Distribution
 
@@ -140,6 +146,7 @@ The config file contains bare minimum parameters for clients, these are shown be
 [Agent] 
   ProviderURL = ""
   ClientID = ""
+  ClientSecret = ""
   BrowserCommand = [""]
   Socket = ""
 
@@ -158,4 +165,3 @@ A thanks for help from
 
 ## TODO
 * Connect with a provisioning user
-* Make zipping deploy.zip a .tar.gz to maintain ACL

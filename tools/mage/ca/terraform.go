@@ -3,6 +3,7 @@ package ca
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 
 	"github.com/gazzenger/sshrimp/internal/config"
 )
@@ -58,9 +59,10 @@ func generateTerraform(c *config.SSHrimp) ([]byte, error) {
 
 func generateVariableDefinitionsFile(c *config.SSHrimp) []byte {
 
-	webidentityPrincipaIdentifiers := "arn:aws:iam::" + strconv.Itoa(c.CertificateAuthority.AccountID) + ":oidc-provider/" + c.CertificateAuthority.IdentityProviderURI
-	webidentityProviderUrl := c.CertificateAuthority.IdentityProviderURI + ":aud"
-	webidentityClientId := c.CertificateAuthority.IdentityProviderClientID
+	identityProviderURI := strings.Replace(c.Agent.ProviderURL, "https://", "", 1)
+	webidentityPrincipaIdentifiers := "arn:aws:iam::" + strconv.Itoa(c.CertificateAuthority.AccountID) + ":oidc-provider/" + identityProviderURI
+	webidentityProviderUrl := identityProviderURI + ":aud"
+	webidentityClientId := c.Agent.ClientID
 
 	outputString := "variable \"webidentity_principal_identifiers\" {\n" +
 		"  type    = string\n" +

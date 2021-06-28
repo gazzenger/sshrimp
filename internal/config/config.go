@@ -26,20 +26,20 @@ type Agent struct {
 
 // CertificateAuthority config for the sshrimp-ca lambda
 type CertificateAuthority struct {
-	AccountID                int
-	Regions                  []string
-	FunctionName             string
-	KeyAlias                 string
-	ForceCommandRegex        string
-	SourceAddressRegex       string
-	UsernameRegex            string
-	UsernameClaim            string
-	ValidAfterOffset         string
-	ValidBeforeOffset        string
-	Extensions               []string
-	ProvisioningUser         string
-	IdentityProviderURI      string
-	IdentityProviderClientID string
+	AccountID          int
+	Regions            []string
+	FunctionName       string
+	KeyAlias           string
+	ForceCommandRegex  string
+	SourceAddressRegex string
+	UsernameRegex      string
+	UsernameClaim      string
+	ValidAfterOffset   string
+	ValidBeforeOffset  string
+	Extensions         []string
+	ProvisioningUser   string
+	// IdentityProviderURI      string
+	// IdentityProviderClientID string
 }
 
 // SSHrimp main configuration struct for sshrimp-agent and sshrimp-ca
@@ -420,8 +420,8 @@ func Wizard(configPath string, config *SSHrimp) (string, error) {
 	}
 
 	//duplicating the necessary fields from Agent Config over to the CertificateAuthority Config
-	newConfig.CertificateAuthority.IdentityProviderURI = strings.Replace(newConfig.Agent.ProviderURL, "https://", "", 1)
-	newConfig.CertificateAuthority.IdentityProviderClientID = newConfig.Agent.ClientID
+	// newConfig.CertificateAuthority.IdentityProviderURI = strings.Replace(newConfig.Agent.ProviderURL, "https://", "", 1)
+	// newConfig.CertificateAuthority.IdentityProviderClientID = newConfig.Agent.ClientID
 
 	// Ask BrowserCommand separately so we can store it as a []string, currently not supported by survey.
 	var browserCommand string
