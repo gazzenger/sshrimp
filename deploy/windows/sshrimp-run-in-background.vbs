@@ -1,2 +1,2 @@
 'HideBat.vbs
-CreateObject("Wscript.Shell").Run "C:\Users\Public\SSHrimp\sshrimp-agent-windows.exe C:\Users\Public\SSHrimp\sshrimp-windows.toml", 0, True
+CreateObject("Wscript.Shell").Run "%USERPROFILE%\SSHrimp\sshrimp-agent-windows.exe %USERPROFILE%\SSHrimp\sshrimp-windows.toml", 0, True
