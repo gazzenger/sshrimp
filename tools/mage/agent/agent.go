@@ -1,16 +1,38 @@
 package agent
 
 import (
-	"archive/zip"
+	"compress/flate"
 	"errors"
-	"io"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 
+	"github.com/BurntSushi/toml"
+	"github.com/jinzhu/copier"
 	"github.com/magefile/mage/sh"
+	"github.com/mholt/archiver/v3"
 )
+
+// Agent config for the sshrimp-agent agent
+type Agent struct {
+	ProviderURL    string
+	ClientID       string
+	ClientSecret   string
+	BrowserCommand []string
+	Socket         string
+}
+
+// CertificateAuthority config for those few additional fields needed for clients TOML config files
+type CertificateAuthority struct {
+	AccountID int
+	Regions   []string
+}
+
+// SSHrimp main configuration struct for sshrimp-agent and sshrimp-ca
+type SSHrimp struct {
+	Agent                Agent
+	CertificateAuthority CertificateAuthority
+}
 
 // Build Builds the local ssh agent
 func Build() error {
@@ -62,47 +84,69 @@ func BuildAll() error {
 }
 
 // Package the deploy folder for clients
-func PackageFiles() error {
+func PackageFiles(configFile string) error {
+	//read in config file
+	var c *SSHrimp
+	_, err := toml.DecodeFile(configFile, &c)
+	if err != nil {
+		return err
+	}
 
-	return RecursiveZip("./deploy", "./deploy.zip")
+	// create new configs
+	winConfig := SSHrimp{}
+	unixConfig := SSHrimp{}
+
+	// deep clone configs from original
+	copier.Copy(&winConfig, &c)
+	copier.Copy(&unixConfig, &c)
+
+	// update the socket field in each config
+	var socketSplit []string
+	if len(c.Agent.Socket) > 9 && c.Agent.Socket[0:9] == "\\\\.\\pipe\\" {
+		socketSplit = strings.Split(c.Agent.Socket, "\\")
+		unixConfig.Agent.Socket = "/tmp/" + socketSplit[len(socketSplit)-1] + ".sock"
+	} else {
+		socketSplit = strings.Split(c.Agent.Socket, "/")
+		winConfig.Agent.Socket = "\\\\\\\\.\\\\pipe\\\\" + socketSplit[len(socketSplit)-1]
+	}
+
+	// Create the config files for each platform
+	err = createOutputConfigFile("./deploy/windows/sshrimp-windows.toml", winConfig)
+	if err != nil {
+		return err
+	}
+	err = createOutputConfigFile("./deploy/mac/sshrimp-mac.toml", unixConfig)
+	if err != nil {
+		return err
+	}
+	err = createOutputConfigFile("./deploy/linux/sshrimp-linux.toml", unixConfig)
+	if err != nil {
+		return err
+	}
+
+	// Instantiate the archiver, ensuring overwrite is enabled
+	z := archiver.Zip{
+		CompressionLevel:       flate.DefaultCompression,
+		MkdirAll:               true,
+		SelectiveCompression:   true,
+		ContinueOnError:        false,
+		OverwriteExisting:      true,
+		ImplicitTopLevelFolder: false,
+	}
+	return z.Archive([]string{"./deploy/windows", "./deploy/mac", "./deploy/linux"}, "./deploy.zip")
 }
 
-// Function to recursively zip a folder
-// taken from https://stackoverflow.com/a/49057861
-func RecursiveZip(pathToZip, destinationPath string) error {
-	destinationFile, err := os.Create(destinationPath)
+// Function to create a new output TOML file with name filename and using config
+// returns any errors
+func createOutputConfigFile(fileName string, config SSHrimp) error {
+	configFile, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
-	myZip := zip.NewWriter(destinationFile)
-	err = filepath.Walk(pathToZip, func(filePath string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		relPath := strings.TrimPrefix(filePath, filepath.Dir(pathToZip))
-		zipFile, err := myZip.Create(relPath)
-		if err != nil {
-			return err
-		}
-		fsFile, err := os.Open(filePath)
-		if err != nil {
-			return err
-		}
-		_, err = io.Copy(zipFile, fsFile)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-	err = myZip.Close()
-	if err != nil {
-		return err
-	}
-	return nil
+	defer configFile.Close()
+
+	// Encode the configuration values as a TOML file
+	encoder := toml.NewEncoder(configFile)
+	err = encoder.Encode(config)
+	return err
 }

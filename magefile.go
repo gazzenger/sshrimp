@@ -22,9 +22,14 @@ func Build() {
 }
 
 // Builds for all platforms and package
-func BuildAndPackage() {
-	mg.Deps(agent.BuildAll, agent.PackageFiles)
-
+// providing the config file is required, as it needs to be read
+// and used for generating config files for each platform
+func BuildAndPackage(configFile string) {
+	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+		fmt.Printf("Config File %s doesn't exist\n", configFile)
+		return
+	}
+	mg.Deps(agent.BuildAll, mg.F(agent.PackageFiles, configFile))
 	fmt.Println("All done.")
 }
 
