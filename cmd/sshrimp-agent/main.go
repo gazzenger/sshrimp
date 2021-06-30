@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
+	"io"
 	"net"
 	"os"
 	"os/signal"
@@ -114,7 +115,7 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 
 	// Accept connections and serve the agent
 	for {
-		var conn net.Conn
+		var conn io.ReadWriteCloser
 		conn, err = listener.Accept()
 		if err != nil {
 			if strings.Contains(err.Error(), "use of closed network connection") {
@@ -124,9 +125,15 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 			return err
 		}
 
-		go agent.ServeAgent(sshrimpAgent, conn)
+		// go agent.ServeAgent(sshrimpAgent, conn)
 		// if err = agent.ServeAgent(sshrimpAgent, conn); err != nil && !errors.Is(err, io.EOF) {
 		// 	return err
 		// }
+
+		err := agent.ServeAgent(sshrimpAgent, conn)
+		if err != nil && err != io.EOF {
+			println(err.Error())
+		}
+
 	}
 }
