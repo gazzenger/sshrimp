@@ -7,7 +7,7 @@ sshrimp-ca
 sshrimp-ca.tf.json
 sshrimp-ca.zip
 
-sshrimp-agent
+/sshrimp-agent
 sshrimp-agent.exe
 sshrimp-agent-linux
 sshrimp-agent-mac
