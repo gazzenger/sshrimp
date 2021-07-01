@@ -4,6 +4,9 @@ SSH Certificate Authority in a lambda, automated by an OpenID Connect enabled ag
 
 Why? Check out this presentation [Zero Trust SSH - linux.conf.au 2020](http://youtu.be/lYzklWPTbsQ).
 
+## How It Works
+![layout](sshrimp-layout.png)
+
 ## ~~ Warning ~~
 
 This is still in very early development. Only use for testing. Not suitable for use in production yet. PR's welcome ;)
