@@ -26,6 +26,8 @@ Build the agent, lambda, and generate terraform code ready for deployment:
 > You will need [AWS credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) in your environment to run `terraform apply`. You can also use [aws-vault](https://github.com/99designs/aws-vault) or [aws-oidc](https://github.com/stoggi/aws-oidc) to more securely manage AWS credentials on the command line.
 
 
+To help with re-deploying each time changes are made, there's an additional ```rebuild.sh``` file which will destroy and re-create the terraform resources.
+
 ## sshd_config (on your server)
 
 Server configruation is minimal. Get the public keys from KMS (using AWS credentials):
@@ -74,32 +76,59 @@ SSH to your host:
 
 ## Usage on Windows
 
-On Windows - you can use WSL and use the server agent exactly the same as on Linux
-or
-If using OpenSSH Client (installed via Windows Features) this currently only supports Pipes, therefore to get this working, configure the socket field in the config file to be 
-```
-Socket = "\\\\.\\pipe\\sshrimp"
-```
-And this can either be referenced by doing the following
+On Windows, there are a number of applications that can be used as an SSH client, these are detailed in the following sections.
+* Win32-OpenSSH Client
+* PuTTY / WinSCP and related programs that use Pageant
+* Windows Subsystem for Linux (WSL)
+
+
+### Win32 - OpenSSH Client
+
+On Windows you can use a built-in OpenSSH client (Win32-OpenSSH), this can either be downloaded and installed manually, built from source [here](https://github.com/PowerShell/Win32-OpenSSH/releases) or downloaded from the Optional Features settings (under Apps and Features on Windows 10) - Called OpenSSH Client.
+
+**Once installed, this SSH client can simply be used by running SSH commands from a Windows CMD**
+
+To use SSHrimp-Agent you cannot use UNIX Socket files (```/tmp/sshrimp.sock```), instead you must use Named Pipes - ```this is a Windows thing```. Named Pipes are written in the format ```\\.\pipe\pipename```
+> So in SSHrimp-Agent, this could be written ```\\.\pipe\sshrimp```, however when defining the socket in the config file, YOU MUST ADD ADDITIONAL escape characters, ```i.e. Socket = "\\\\.\\pipe\\sshrimp"```
+
+To use this newly defined named pipe when using SSH from a Windows CMD, you will also need to perform some additional tasks, you can either
+
+1) Set the SSH_AUTH_SOCK environment variable,
 ```cmd
 set SSH_AUTH_SOCK=\\.\pipe\ssh-pageant
 ssh username@ipaddress
 ```
-or setup the config file 
-```cmd
-Host [HOSTNAME]
-    HostName [IPADDRESS]
+
+2) Or configure the IdentityAgent inside your ```~\.ssh\config``` file,
+```bash
+Host [NICKNAME]
+    HostName [IP or HOSTNAME]
     User [USERNAME]
     IdentityAgent \\.\pipe\sshrimp
     ForwardAgent yes
 ```
-Then run the ssh command
-```cmd
-ssh [HOSTNAME]
-```
+> In this example I have also defined to forward the agent, this is useful if you are planning on using other libraries to read the users signed certificate, i.e. inheriting sudo privileges etc.
+
+> To use the config file for SSH access, simply run the command ```ssh [NICKNAME]```
+
+
+### PuTTY, WinSCP and Related programs
+PuTTY, WinSCP and other related programs utilise the Putty Agent (Pageant).
+
+Doing a lot of seraching, I found a repo by Nathan Beals which worked as a Pageant-style SSH-Agent proxy/emulator, find out more information [here](https://github.com/ndbeals/winssh-pageant).
+
+When using SSHrimp-Agent for connecting a PuTTY, WinSCP or similar client, please ensure the config file references the socket as a named pipe, ```i.e. \\\\.\\pipe\\sshrimp``` and **NOT** as a UNIX socket, otherwise the Pageant emulator will not start when running SSHrimp-Agent.
+
+It is also recommended that the actual Pageant application is never running at the same time SSHrimp-Agent is running, to avoid conflicts with Pageant connections.
+
+### Windows Subsystem for Linux (WSL)
+
+If using WSL, then you must use the SSHrimp-Agent like on a linux system, that means defining the config file with UNIX sockets ```i.e. Socket = /tmp/sshrimp.sock```
+
+*Please note that to use an SSH Agent within WSL, you will need to use the SSH client in WSL as well (i.e. it won't work directly from Win32-OpenSSH or PuTTY)*
 
 ## Deployment Config File
-Some of the default config settings are listed below
+Some of the fields that can be provided in config file are listed below,
 ```toml
 [Agent] 
   ProviderURL = ""
@@ -122,26 +151,28 @@ Some of the default config settings are listed below
   Extensions = ["permit-agent-forwarding", "permit-port-forwarding", "permit-pty", "permit-user-rc", "permit-x11-forwarding"]
   ProvisioningUser = "provisioninguser"
 ```
-> Please note the Browser command is no longer needed, with the updated AWS-OIDC, as the default browser can be utilised.
-
-> Also Socket can be defined as a UNIX socket file, OR a Windows Named Pipe
+> Please note the Browser command is no longer being used, as instead the default browseris now always used.
 
 ## Provisioning User
-A new feature is to add a provisioning user field to the config file.
-This is then used by SSHrimp-CA to add this user as an additional principal to the signed ssh-key.
+
+An additional setting, this provided name will be added as an additional Principle name to the SSH certificate when signed.
+
+*This is intended to be utilised when provisioning new users, through a future repository*
 
 ## Client Distribution
 
 To build the SSHrimp-Agent for distribution across Windows, Linux and Mac, run the following mage command.
-*Please note this only runs on Windows, as the Windows Build requires packages only found on Windows*
 
-    mage buildandpackage
-> This will build the sshrimp-agent for Windows, Mac and Linux and place these in the deploy folder, and zip it up
+*Please note the BuildAndPackage command onlys builds on a Windows platform, specifically because building the Windows executable requires certain libraries only available on Windows, i.e winio*
 
+    mage buildandpackage [config file]
+> The ```[config file]``` is mandatory, and is used to generate the config file for each platform.
 
-The output zip file is ```deploy.zip```, and contains the built sshrimp-agent executable for Windows, Mac and Linux in separate folders, with the config files, and deploy scripts.
+> This will build the sshrimp-agent for Windows, Mac and Linux and place these in the deploy folder.
 
-The config file contains bare minimum parameters for clients, these are shown below.
+The deploy folder is zipped into an archive, ```deploy.zip```, and contains the sshrimp-agent executable for each platform, as well as all the required config files and deploy scripts.
+
+For distribution, the config file ONLY contains the bare minimum parameters, which are,
 ```toml
 [Agent] 
   ProviderURL = ""
@@ -157,11 +188,11 @@ The config file contains bare minimum parameters for clients, these are shown be
 ## Code Sources
 A thanks for help from
 - Main body of this repository is forked from Jeremy Stott's SSHrimp project - https://github.com/stoggi/sshrimp - MIT
+- Windows Pageant emulation/proxying - https://github.com/ndbeals/winssh-pageant -  BSD-3-Clause
 - Usage with Pipes on Windows - https://github.com/benpye/wsl-ssh-pageant - BSD 2-Clause
 - Minor updates to Serve Agent for allowing multiple connections - https://github.com/daveadams/vaulted/blob/56a9a631ececd4610d83d6499725b34d64285ccc/lib/proxy_keyring.go#L82 - MIT
-- Recursively zip folder - https://stackoverflow.com/a/49057861
 - Create a launch agent on Mac - https://stackoverflow.com/questions/6442364/running-script-upon-login-mac
 
 
 ## TODO
-* Connect with a provisioning user
+* Investigate extending the principle names with an additional name for the users email (this will make it easier when provisioning the user for the first time)

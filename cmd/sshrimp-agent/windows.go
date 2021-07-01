@@ -8,6 +8,8 @@ import (
 	"os"
 
 	"github.com/Microsoft/go-winio"
+	"github.com/gazzenger/winssh-pageant/pageant"
+	"github.com/lxn/win"
 )
 
 // func GetSystemSecurityDescriptor() string {
@@ -29,6 +31,11 @@ func InitListener(socketAddress string, err error) (net.Listener, error) {
 		var cfg = &winio.PipeConfig{
 			// SecurityDescriptor: GetSystemSecurityDescriptor(),
 		}
+
+		// start the pageant proxy
+		// Taken from https://github.com/ndbeals/winssh-pageant
+		go StartPageant(namedPipeFullName)
+
 		return winio.ListenPipe(namedPipeFullName, cfg)
 	} else {
 		// testing to ensure nothing else is using the AF_UNIX domain socket file
@@ -46,5 +53,22 @@ func InitListener(socketAddress string, err error) (net.Listener, error) {
 		// socket, only allow the current user to write to the socket.
 		// syscall.Umask(0077)
 		return net.Listen("unix", socketAddress)
+	}
+}
+
+func StartPageant(pipe string) {
+	pageant.SshPipe = &pipe
+
+	pageantWindow := pageant.CreatePageantWindow()
+	if pageantWindow == 0 {
+		fmt.Println(fmt.Errorf("CreateWindowEx failed: %v", win.GetLastError()))
+		return
+	}
+
+	// main message loop
+	var msg win.MSG
+	for win.GetMessage(&msg, 0, 0, 0) > 0 {
+		win.TranslateMessage(&msg)
+		win.DispatchMessage(&msg)
 	}
 }
