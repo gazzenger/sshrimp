@@ -10,10 +10,6 @@ import (
 	"github.com/Microsoft/go-winio"
 )
 
-const (
-	AgentMaxMessageLength = 1<<14 - 1
-)
-
 // func GetSystemSecurityDescriptor() string {
 //
 // SDDL encoded.
@@ -51,9 +47,4 @@ func InitListener(socketAddress string, err error) (net.Listener, error) {
 		// syscall.Umask(0077)
 		return net.Listen("unix", socketAddress)
 	}
-}
-
-// QueryAgent provides a way to query the named windows openssh agent pipe
-func QueryAgent(pipeName string, buf []byte) (result []byte, err error) {
-	return
 }

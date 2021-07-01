@@ -4,7 +4,6 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"fmt"
 	"io"
 	"net"
 	"os"
@@ -14,7 +13,6 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/gazzenger/sshrimp/internal/config"
 	"github.com/gazzenger/sshrimp/internal/sshrimpagent"
-	"github.com/lxn/win"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
 )
@@ -24,10 +22,6 @@ var sigs = []os.Signal{os.Kill, os.Interrupt}
 var cli struct {
 	Config string `kong:"arg,type='string',help='sshrimp config file (default: ${config_file} or ${env_var_name} environment variable)',default='${config_file}',env='SSHRIMP_CONFIG'"`
 }
-
-var (
-	sshrimpAgent agent.Agent
-)
 
 func main() {
 	ctx := kong.Parse(&cli,
@@ -109,24 +103,7 @@ func launchAgent(c *config.SSHrimp, ctx *kong.Context) error {
 	}
 
 	// Create the sshrimp agent with our configuration and the private key signer
-	sshrimpAgent = sshrimpagent.NewSSHrimpAgent(c, signer)
-
-	go pipeProxy()
-
-	pageantWindow := createPageantWindow()
-	if pageantWindow == 0 {
-		fmt.Println(fmt.Errorf("CreateWindowEx failed: %v", win.GetLastError()))
-		return fmt.Errorf("CreateWindowEx failed: %v", win.GetLastError())
-	}
-
-	// main message loop
-	var msg win.MSG
-	go func() {
-		for win.GetMessage(&msg, 0, 0, 0) > 0 {
-			win.TranslateMessage(&msg)
-			win.DispatchMessage(&msg)
-		}
-	}()
+	sshrimpAgent := sshrimpagent.NewSSHrimpAgent(c, signer)
 
 	// Listen for signals so that we can close the listener and exit nicely
 	osSignals := make(chan os.Signal)

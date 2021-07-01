@@ -16,13 +16,11 @@ require (
 	github.com/gazzenger/aws-oidc v0.0.0-20210620061911-39a318848078
 	github.com/jinzhu/copier v0.3.2 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
-	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
 	github.com/magefile/mage v1.11.0 // indirect
 	github.com/mholt/archiver/v3 v3.5.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 	gopkg.in/square/go-jose.v2 v2.4.1 // indirect
 )
