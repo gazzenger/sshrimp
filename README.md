@@ -94,6 +94,8 @@ On Windows you can use a built-in OpenSSH client (Win32-OpenSSH), this can eithe
 To use SSHrimp-Agent you cannot use UNIX Socket files (```/tmp/sshrimp.sock```), instead you must use Named Pipes - ```this is a Windows thing```. Named Pipes are written in the format ```\\.\pipe\pipename```
 > So in SSHrimp-Agent, this could be written ```\\.\pipe\sshrimp```, however when defining the socket in the config file, YOU MUST ADD ADDITIONAL escape characters, ```i.e. Socket = "\\\\.\\pipe\\sshrimp"```
 
+> Note that the default named pipe for OpenSSH Agent is \\.\pipe\openssh-ssh-agent, so if you use this with SSHrimp, then SSHrimp will be used as an SSH-Agent for all OpenSSH connections by default.
+
 To use this newly defined named pipe when using SSH from a Windows CMD, you will also need to perform some additional tasks, you can either
 
 1) Set the SSH_AUTH_SOCK environment variable,
